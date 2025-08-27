@@ -1,0 +1,264 @@
+<!-- this version is for with the local camera, but not up to date with saving on server -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Blinky</title>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js/dist/face-api.min.js"></script>
+    <style>
+        :root {
+            --eye-size: 120px;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+                /* important: the 'lid' is inside the circle */
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .eyes {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .eye {
+            width: var(--eye-size);
+            height: var(--eye-size);
+            background: #fff;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            /* important: the 'lid' is inside the circle */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* pupil */
+        .pupil {
+            width: 40%;
+            height: 40%;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+            transform: translateY(2%);
+            /* light 'alive' */
+        }
+
+        /* upper eyelid (black overlay that comes down) */
+        .lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            border: black;
+            height: 100%;
+            background: #000;
+            transform: translateY(-100%);
+            /* hidden above the eyeball */
+            pointer-events: none;
+        }
+
+        /* the animation itself — duration is set via CSS variable */
+        @keyframes blinkAnim {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            /* open */
+            30% {
+                transform: translateY(0%);
+            }
+
+            /* closed (downwards) */
+            60% {
+                transform: translateY(0%);
+            }
+
+            /* even closed */
+            100% {
+                transform: translateY(-100%);
+            }
+
+            /* again open */
+        }
+
+        /* when .blink is, play animation */
+        .eye.blink .lid {
+            animation: blinkAnim var(--blink-duration, 120ms) ease-in-out both;
+        }
+
+        .eye.blink .pupil {
+            transform: translateY(6%) scaleY(0.9);
+            transition: transform calc(var(--blink-duration, 120ms) / 2) ease-in-out;
+        }
+
+        /* ------------------------------------------------------ */
+
+        .message_container {
+            position: absolute;
+            bottom: 75%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(200, 200, 200, 0);
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            color: white;
+            font-size: medium;
+            box-shadow: 0 0 15px 10px rgb(255, 255, 255);
+            z-index: 1000;
+        }
+
+        /* Thought bubble */
+        .message_container .bubble {
+            position: absolute;
+            background: black;
+            border-radius: 50%;
+            box-shadow: 0 0 15px 10px rgb(255, 255, 255);
+        }
+
+        .message_container .bubble.big {
+            width: 25px;
+            height: 25px;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px 10px rgb(255, 255, 255);
+        }
+
+        .message_container .bubble.medium {
+            width: 15px;
+            height: 15px;
+            bottom: -65px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px 6px rgb(255, 255, 255);
+        }
+
+        .message_container .bubble.small {
+            width: 8px;
+            height: 8px;
+            bottom: -85px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px 4px rgb(255, 255, 255);
+        }
+
+        /* Show the message container */
+        .message_container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 420px) {
+            :root {
+                --eye-size: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message_container">
+    <message>I understand why it's looking at me. I'm just sooo cute.</message>
+        <div class="bubble big"></div>
+        <div class="bubble medium"></div>
+        <div class="bubble small"></div>
+    </div>
+
+    <div class="eyes">
+        <div class="eye" id="eye-left">
+            <div class="pupil"></div>
+            <div class="lid"></div>
+        </div>
+        <div class="eye" id="eye-right">
+            <div class="pupil"></div>
+            <div class="lid"></div>
+        </div>
+    </div>
+
+    <video id="video" style="display:block; position:absolute; opacity: 0;" width="320" height="240" autoplay muted></video>
+
+    <script>
+        const eyes = Array.from(document.querySelectorAll('.eye'));
+
+        function doBlink(eye, durationMs) {
+            if (eye.classList.contains('blink')) return;
+            eye.style.setProperty('--blink-duration', durationMs + 'ms');
+            eye.classList.add('blink');
+            setTimeout(() => eye.classList.remove('blink'), durationMs + 50);
+        }
+
+        function randomBlink() {
+            const nextDelay = Math.random() * 4000 + 2000; // 2000..6000 ms
+            const blinkDuration = Math.floor(Math.random() * 140) + 80; // 80..220 ms
+            const r = Math.random();
+
+            if (r < 0.75) {
+                eyes.forEach(e => doBlink(e, blinkDuration));
+                if (Math.random() < 0.12) {
+                    const secondDuration = Math.floor(Math.random() * 120) + 60;
+                    const gap = Math.floor(Math.random() * 180) + 60;
+                    setTimeout(() => eyes.forEach(e => doBlink(e, secondDuration)), blinkDuration + gap);
+                }
+            } else if (r < 0.9) {
+                doBlink(eyes[0], blinkDuration);
+            } else {
+                doBlink(eyes[1], blinkDuration);
+            }
+
+            setTimeout(randomBlink, nextDelay);
+        }
+
+        setTimeout(randomBlink, Math.random() * 1200 + 400);
+
+        async function start() {
+            const video = document.getElementById('video');
+
+            // Start camera
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            console.log("Camera started");
+
+            console.log("Loading models...");
+            // Load models (make sure the /models folder exists with the model files)
+            await faceapi.nets.tinyFaceDetector.loadFromUri('models');
+            var lastTimeout;
+            video.addEventListener('loadeddata', () => {
+                console.log("Video loaded, starting detection loop...");
+                setInterval(async () => {
+                    const detections = await faceapi.detectAllFaces(
+                        video,
+                        new faceapi.TinyFaceDetectorOptions()
+                    );
+                    console.log("Number of faces detected:", detections.length);
+                    if (detections.length > 0) {
+                        clearTimeout(lastTimeout);
+                        document.querySelector('.message_container').classList.add('show');
+                        lastTimeout = setTimeout(() => {
+                            document.querySelector('.message_container').classList.remove('show');
+                        }, 2500);
+                    }
+                }, 1000);
+            });
+        }
+
+        start();
+    </script>
+</body>
+
+</html>

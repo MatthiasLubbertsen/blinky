@@ -1,0 +1,34 @@
+<!-- this version is for testing the counter -->
+<video id="video" style="display:absolute; opacity: 0;" width="320" height="240" autoplay muted></video>
+
+<!-- loading correct build -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js/dist/face-api.min.js"></script>
+
+<script>
+    async function start() {
+        const video = document.getElementById('video');
+
+    // Start camera
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        console.log("Camera started");
+
+        console.log("Loading models...");
+        // load models (make sure the /models directory exists with the model files)
+        await faceapi.nets.tinyFaceDetector.loadFromUri('models');
+
+        video.addEventListener('loadeddata', () => {
+            console.log("Video loaded, starting detection loop...");
+            setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(
+                    video,
+                    new faceapi.TinyFaceDetectorOptions()
+                );
+                console.log("Number of faces detected:", detections.length);
+            }, 1000);
+        });
+
+    }
+
+    start();
+</script>

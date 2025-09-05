@@ -7,12 +7,7 @@ const fs = require("fs");
 const os = require('os');
 
 const app = express();
-const helmet = require('helmet');
 
-// Add secure headers
-app.use(helmet());
-
-// If running behind a proxy (nginx, cloud), trust proxy so req.secure/x-forwarded-proto work
 app.set('trust proxy', true);
 
 const server = https.createServer({

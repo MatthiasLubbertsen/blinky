@@ -6,7 +6,7 @@ A lovely screensaver pet with animated eyes that follows faces using your phone'
 
 ## What's this?
 
-Blinky is a fun little web-based screensaver that puts a pair of adorable eyes on any display. Hook it up to a phone running face detection, and watch as Blinky reacts to people walking by! Perfect for:
+Blinky is a fun little web-based screensaver that puts a pair of adorable eyes on any display. It works by connecting two web pages via WebSocket: one page shows Blinky's eyes on your main display, while another page runs on your phone to detect faces using its camera. When someone walks by, the phone detects their face and instantly tells Blinky to react through the WebSocket connection! Perfect for:
 
 - Your work desk setup
 - Shop windows
@@ -47,7 +47,16 @@ npm start
 1. Open https://YOUR_IP:8080 _(ip can be found in terminal)_ in Chrome on a computer or laptop (for bigger screen). Other browsers have not been tested yet, see GitHub issues for browser compatibility updates.
    - You'll get a security warning (self-signed cert)
    - Click "More info/Details" then "Continue to unsafe site"
+   - This loads the Blinky eyes interface that will react to detected faces
+   - It automatically connects to the server via WebSocket to receive face detection events
+
 2. On your phone (or another device), open https://YOUR_IP:8080/camera _(ip can be found in terminal)_
+   - This loads the camera interface that does the face detection
+   - When faces are detected, it sends that data to the server
+   - The server then notifies the Blinky eyes interface via WebSocket
+   - Blinky will show a thought bubble message when faces are detected
+
+3. Watch Blinky react when faces are detected on the phone camera!
 
 ---
 <img src="docs/assets/phone.jpg" alt="Phone Camera View" width="250" />

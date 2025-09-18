@@ -1,11 +1,14 @@
-<!-- This is the real Blinky app. -->
+<!-- Welcome to Blinky - The world's friendliest screensaver pet! 👀✨ -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Blinky</title>
+    <title>Blinky 👀 - Your Friendly Digital Pet</title>
+    <meta name="description" content="The world's friendliest screensaver pet! Animated eyes that react to faces detected through your phone's camera.">
+    <meta name="keywords" content="screensaver, digital pet, face detection, interactive, websocket, blinky">
+    <meta name="author" content="Matthias Lubbertsen">
     <style>
         :root {
             --eye-size: 120px;
@@ -154,7 +157,7 @@
 
 <body>
     <div class="message_container">
-    <message>I understand why it's looking at me. I'm just sooo cute.</message>
+    <message id="blinky-message">Hello there! 👋</message>
         <div class="bubble big"></div>
         <div class="bubble medium"></div>
         <div class="bubble small"></div>
@@ -174,7 +177,31 @@
     <script>
         const eyes = Array.from(document.querySelectorAll('.eye'));
         const messageContainer = document.querySelector('.message_container');
+        const messageElement = document.getElementById('blinky-message');
         let lastTimeout;
+
+        // Fun messages that Blinky can say when faces are detected! 🎉
+        const blinkyMessages = [
+            "Hello there! 👋",
+            "I see you! 👀✨", 
+            "Someone's looking fabulous today! 😊",
+            "Ooh, a visitor! Welcome! 🎉",
+            "You caught my attention! 👁️",
+            "Is that a smile I detect? 😄",
+            "Looking good there, human! ✨",
+            "I love having company! 💕",
+            "You're in my sight now! 🎯",
+            "Face detected... initiating cuteness! 🐾",
+            "Well hello, gorgeous! 💫",
+            "Someone walked into my world! 🌟",
+            "I understand why it's looking at me. I'm just sooo cute! 😉",
+            "My sensors are tingling! 🤖",
+            "Target acquired: ADORABLE! 🎯"
+        ];
+
+        function getRandomMessage() {
+            return blinkyMessages[Math.floor(Math.random() * blinkyMessages.length)];
+        }
 
         function doBlink(eye, durationMs) {
             if (eye.classList.contains('blink')) return;
@@ -227,8 +254,9 @@
                     if (data.type === 'faceDetected') {
                         console.log(`Face detected! Count: ${data.count}`);
                         
-                        // Show the thought bubble
+                        // Show the thought bubble with a random message
                         clearTimeout(lastTimeout);
+                        messageElement.textContent = getRandomMessage();
                         messageContainer.classList.add('show');
                         
                         // Hide after 2.5 seconds

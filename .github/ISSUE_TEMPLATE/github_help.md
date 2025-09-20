@@ -25,6 +25,6 @@ Error messages or unexpected behavior
 If you have error messages, add them here!
 
 ### Checklist ✅
-- [ ] Read CONTRIBUTING.md
+- [ ] Read README.md
 - [ ] Searched existing issues
 - [ ] Checked Git documentation

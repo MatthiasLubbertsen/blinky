@@ -170,10 +170,9 @@ app.post("/api", (req, res) => {
 });
 
 // Admin route to view md files
-// -- replace the existing /admin route with this version --
 app.get("/admin", (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const filesPerPage = 10;
+    const filesPerPage = 5; // Number of files per page
     const detectionsDir = path.join(__dirname, "detections");
 
     if (!fs.existsSync(detectionsDir)) {
@@ -327,7 +326,7 @@ app.get("/admin", (req, res) => {
             .pagination a.current { background: linear-gradient(90deg,var(--accent), #2ec7a7); color: #081421; font-weight:700; border: none; }
             footer { text-align:center; color:var(--muted); margin-top: 28px; font-size: 13px; }
             .toprow { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-            .toprow .search { padding:8px 12px; background:var(--card); border-radius:8px; border:1px solid rgba(255,255,255,0.02); color: var(--muted); }
+            .toprow .message { padding:8px 12px; background:var(--card); border-radius:8px; border:1px solid rgba(255,255,255,0.02); color: var(--muted); }
             @media (max-width:720px) {
                 .container { padding: 12px; }
             }
@@ -341,7 +340,7 @@ app.get("/admin", (req, res) => {
                     <div class="stats">Total detections: ${files.length} &nbsp;&middot;&nbsp; Page ${page} of ${totalPages}</div>
                 </div>
                 <div class="toprow">
-                    <div class="search">Showing latest detections (dark mode)</div>
+                    <div class="message">Reload page to see new detections</div>
                 </div>
             </header>
     `;
